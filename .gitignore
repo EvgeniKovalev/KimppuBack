@@ -1,0 +1,7 @@
+
+Kimppu/obj*
+Kimppu/bin*
+appsettings.Development.json
+*.suo
+*.user
+.vs/*
