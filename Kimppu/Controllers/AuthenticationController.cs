@@ -18,6 +18,12 @@ namespace Marketplace.Controllers
 			_authService = authService;
 		}
 
+		[HttpGet("version")]
+		public async Task<IActionResult> GetVersion()
+		{
+			return Ok(new ResponseDto() { IsSuccess = true, Token = "", Message = $"", Model="55" });
+		}
+
 		[HttpGet("session")]
 		public async Task<IActionResult> InitSession()
 		{
