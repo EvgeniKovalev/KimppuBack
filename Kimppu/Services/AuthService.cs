@@ -59,28 +59,26 @@ namespace Marketplace
 		/// <returns></returns>
 		internal async Task<string> InitVisitorSession(string currentUserToken)
 		{
-			////var newUserToken = Guid.NewGuid().ToString();
-			////await _cartService.AssignCartToUser(currentUserToken, newUserToken);
+			var newUserToken = Guid.NewGuid().ToString();
+			await _cartService.AssignCartToUser(currentUserToken, newUserToken);
 
-			////var tokenHandler = new JwtSecurityTokenHandler();
+			var tokenHandler = new JwtSecurityTokenHandler();
 
-			////var claims = new List<Claim> {
-			////	new (JwtRegisteredClaimNames.Sid, newUserToken),
-			////	new (JwtRegisteredClaimNames.Aud, _repositorySettings.GetAudience()),
-			////	new (JwtRegisteredClaimNames.Iss, _repositorySettings.GetAudienceIssuer())
-			////};
+			var claims = new List<Claim> {
+				new (JwtRegisteredClaimNames.Sid, newUserToken),
+				new (JwtRegisteredClaimNames.Aud, _repositorySettings.GetAudience()),
+				new (JwtRegisteredClaimNames.Iss, _repositorySettings.GetAudienceIssuer())
+			};
 
-			////var tokenDescriptor = new SecurityTokenDescriptor
-			////{
-			////	Subject = new ClaimsIdentity(claims),
-			////	Expires = DateTime.UtcNow.AddDays(1),
-			////	SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_repositorySettings.GetJwtKey()), SecurityAlgorithms.HmacSha256)
-			////};
+			var tokenDescriptor = new SecurityTokenDescriptor
+			{
+				Subject = new ClaimsIdentity(claims),
+				Expires = DateTime.UtcNow.AddDays(1),
+				SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_repositorySettings.GetJwtKey()), SecurityAlgorithms.HmacSha256)
+			};
 
-			////var token = tokenHandler.CreateToken(tokenDescriptor);
-			////return tokenHandler.WriteToken(token);
-			///
-			return "dkpfktoken";
+			var token = tokenHandler.CreateToken(tokenDescriptor);
+			return tokenHandler.WriteToken(token);
 		}
 
 		/// <summary>
@@ -92,37 +90,36 @@ namespace Marketplace
 		/// <exception cref="ArgumentNullException"></exception>
 		internal async Task<string> Login(LoginDto loginModel, string visitorToken)
 		{
-			//if (loginModel == null || string.IsNullOrWhiteSpace(loginModel.Email) || string.IsNullOrWhiteSpace(loginModel.Password))
-			//{
-			//	throw new ArgumentNullException("model_error");
-			//}
+			if (loginModel == null || string.IsNullOrWhiteSpace(loginModel.Email) || string.IsNullOrWhiteSpace(loginModel.Password))
+			{
+				throw new ArgumentNullException("model_error");
+			}
 
-			//var user = await GetUser(loginModel.Email);
-			//if (user == null || !loginModel.Password.Equals(user.Password))
-			//{
-			//	throw new ArgumentNullException("password_mismatch");
-			//}
+			var user = await GetUser(loginModel.Email);
+			if (user == null || !loginModel.Password.Equals(user.Password))
+			{
+				throw new ArgumentNullException("password_mismatch");
+			}
 
-			//await _cartService.AssignCartToUser(visitorToken, user.Guid);
+			await _cartService.AssignCartToUser(visitorToken, user.Guid);
 
-			//var tokenHandler = new JwtSecurityTokenHandler();
-			//var claims = new List<Claim> {
-			//	new (JwtRegisteredClaimNames.Sid, user.Guid),
-			//	new (JwtRegisteredClaimNames.Sub, user.Guid),
-			//	new (JwtRegisteredClaimNames.Aud, _repositorySettings.GetAudience()),
-			//	new (JwtRegisteredClaimNames.Iss, _repositorySettings.GetAudienceIssuer())
-			//};
+			var tokenHandler = new JwtSecurityTokenHandler();
+			var claims = new List<Claim> {
+				new (JwtRegisteredClaimNames.Sid, user.Guid),
+				new (JwtRegisteredClaimNames.Sub, user.Guid),
+				new (JwtRegisteredClaimNames.Aud, _repositorySettings.GetAudience()),
+				new (JwtRegisteredClaimNames.Iss, _repositorySettings.GetAudienceIssuer())
+			};
 
-			//var tokenDescriptor = new SecurityTokenDescriptor
-			//{
-			//	Subject = new ClaimsIdentity(claims),
-			//	Expires = DateTime.UtcNow.AddDays(5),
-			//	SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_repositorySettings.GetJwtKey()), SecurityAlgorithms.HmacSha256)
-			//};
+			var tokenDescriptor = new SecurityTokenDescriptor
+			{
+				Subject = new ClaimsIdentity(claims),
+				Expires = DateTime.UtcNow.AddDays(5),
+				SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_repositorySettings.GetJwtKey()), SecurityAlgorithms.HmacSha256)
+			};
 
-			//var token = tokenHandler.CreateToken(tokenDescriptor);
-			//return tokenHandler.WriteToken(token);
-			return "toksskksks";
+			var token = tokenHandler.CreateToken(tokenDescriptor);
+			return tokenHandler.WriteToken(token);
 		}
 
 		/// <summary>
@@ -132,41 +129,40 @@ namespace Marketplace
 		/// <returns></returns>
 		internal async Task<string> ApplyEmail(LoginDto loginModel)
 		{
-			//var claims = new List<Claim>();
-			//var user = await GetUser(loginModel.Email);
+			var claims = new List<Claim>();
+			var user = await GetUser(loginModel.Email);
 
-			//if (user != null)
-			//{
-			//	if (!string.IsNullOrWhiteSpace(user.Password) && string.IsNullOrWhiteSpace(user.Code))
-			//	{
-			//		claims.Add(new(JwtRegisteredClaimNames.Sub, user.Guid));
-			//	}
-			//	else
-			//	{
-			//		await RenewPasscode(user.Id);
-			//		user = await GetUser(loginModel.Email);
-			//		_ = _communicationService.SendEmailCode(loginModel.Email, user.Code);
-			//		claims.Add(new(JwtRegisteredClaimNames.Sub, "swoop_secure_login"));
-			//	}
-			//}
-			//else
-			//{
-			//	user = await EstablishUser(loginModel.Email);
+			if (user != null)
+			{
+				if (!string.IsNullOrWhiteSpace(user.Password) && string.IsNullOrWhiteSpace(user.Code))
+				{
+					claims.Add(new(JwtRegisteredClaimNames.Sub, user.Guid));
+				}
+				else
+				{
+					await RenewPasscode(user.Id);
+					user = await GetUser(loginModel.Email);
+					_ = _communicationService.SendEmailCode(loginModel.Email, user.Code);
+					claims.Add(new(JwtRegisteredClaimNames.Sub, "swoop_secure_login"));
+				}
+			}
+			else
+			{
+				user = await EstablishUser(loginModel.Email);
 
-			//	_ = _communicationService.SendEmailCode(loginModel.Email, user.Code);
-			//	claims.Add(new(JwtRegisteredClaimNames.Sub, "swoop_secure_login"));
-			//}
+				_ = _communicationService.SendEmailCode(loginModel.Email, user.Code);
+				claims.Add(new(JwtRegisteredClaimNames.Sub, "swoop_secure_login"));
+			}
 
-			//var tokenDescriptor = new SecurityTokenDescriptor
-			//{
-			//	Expires = DateTime.UtcNow.AddMinutes(1),
-			//	Subject = new ClaimsIdentity(claims)
-			//};
+			var tokenDescriptor = new SecurityTokenDescriptor
+			{
+				Expires = DateTime.UtcNow.AddMinutes(1),
+				Subject = new ClaimsIdentity(claims)
+			};
 
-			//var tokenHandler = new JwtSecurityTokenHandler();
-			//var token = tokenHandler.CreateToken(tokenDescriptor);
-			//return tokenHandler.WriteToken(token);
-			return "ttokkkask";
+			var tokenHandler = new JwtSecurityTokenHandler();
+			var token = tokenHandler.CreateToken(tokenDescriptor);
+			return tokenHandler.WriteToken(token);
 		}
 
 		/// <summary>
@@ -176,35 +172,33 @@ namespace Marketplace
 		/// <returns></returns>
 		internal async Task<string> ApplyCode(LoginDto loginModel)
 		{
-			////if (loginModel == null || string.IsNullOrWhiteSpace(loginModel.Email) || string.IsNullOrWhiteSpace(loginModel.Code))
-			////{
-			////	throw new ArgumentException("model_error");
-			////}
+			if (loginModel == null || string.IsNullOrWhiteSpace(loginModel.Email) || string.IsNullOrWhiteSpace(loginModel.Code))
+			{
+				throw new ArgumentException("model_error");
+			}
 
-			////var user = await GetUser(loginModel.Email);
-			////if (user == null)
-			////{
-			////	throw new ArgumentException("user_not_found");
-			////}
+			var user = await GetUser(loginModel.Email);
+			if (user == null)
+			{
+				throw new ArgumentException("user_not_found");
+			}
 
-			////if (user.Code?.ToLower() != loginModel.Code?.ToLower())
-			////{
-			////	throw new ArgumentException("code_mismatch");
-			////}
-			////await ClearUserCode(user.Id);
+			if (user.Code?.ToLower() != loginModel.Code?.ToLower())
+			{
+				throw new ArgumentException("code_mismatch");
+			}
+			await ClearUserCode(user.Id);
 
-			////var claims = new List<Claim>();
-			////claims.Add(new(JwtRegisteredClaimNames.Sub, "swoop_secure_password_renew"));
-			////var tokenDescriptor = new SecurityTokenDescriptor
-			////{
-			////	Expires = DateTime.UtcNow.AddMinutes(1),
-			////	Subject = new ClaimsIdentity(claims)
-			////};
-			////var tokenHandler = new JwtSecurityTokenHandler();
-			////var token = tokenHandler.CreateToken(tokenDescriptor);
-			////return tokenHandler.WriteToken(token);
-			///
-			return "tokennnnooo";
+			var claims = new List<Claim>();
+			claims.Add(new(JwtRegisteredClaimNames.Sub, "swoop_secure_password_renew"));
+			var tokenDescriptor = new SecurityTokenDescriptor
+			{
+				Expires = DateTime.UtcNow.AddMinutes(1),
+				Subject = new ClaimsIdentity(claims)
+			};
+			var tokenHandler = new JwtSecurityTokenHandler();
+			var token = tokenHandler.CreateToken(tokenDescriptor);
+			return tokenHandler.WriteToken(token);
 		}
 
 		/// <summary>
@@ -214,30 +208,29 @@ namespace Marketplace
 		/// <returns></returns>
 		internal async Task<string> ForgotPassword(LoginDto loginModel)
 		{
-			//if (loginModel == null || string.IsNullOrWhiteSpace(loginModel.Email))
-			//{
-			//	throw new ArgumentException("model_error");
-			//}
+			if (loginModel == null || string.IsNullOrWhiteSpace(loginModel.Email))
+			{
+				throw new ArgumentException("model_error");
+			}
 
-			//var user = await GetUser(loginModel.Email);
-			//if (user == null)
-			//{
-			//	throw new ArgumentException("user_not_found");
-			//}
+			var user = await GetUser(loginModel.Email);
+			if (user == null)
+			{
+				throw new ArgumentException("user_not_found");
+			}
 
-			//await RenewPasscode(user.Id);
+			await RenewPasscode(user.Id);
 
-			//var claims = new List<Claim>();
-			//claims.Add(new(JwtRegisteredClaimNames.Sub, "swoop_secure_password_forgot"));
-			//var tokenDescriptor = new SecurityTokenDescriptor
-			//{
-			//	Expires = DateTime.UtcNow.AddMinutes(1),
-			//	Subject = new ClaimsIdentity(claims)
-			//};
-			//var tokenHandler = new JwtSecurityTokenHandler();
-			//var token = tokenHandler.CreateToken(tokenDescriptor);
-			//return tokenHandler.WriteToken(token);
-			return "tokennnn";
+			var claims = new List<Claim>();
+			claims.Add(new(JwtRegisteredClaimNames.Sub, "swoop_secure_password_forgot"));
+			var tokenDescriptor = new SecurityTokenDescriptor
+			{
+				Expires = DateTime.UtcNow.AddMinutes(1),
+				Subject = new ClaimsIdentity(claims)
+			};
+			var tokenHandler = new JwtSecurityTokenHandler();
+			var token = tokenHandler.CreateToken(tokenDescriptor);
+			return tokenHandler.WriteToken(token);
 		}
 
 		/// <summary>
@@ -248,13 +241,13 @@ namespace Marketplace
 		/// <exception cref="ArgumentException"></exception>
 		internal async Task ResetPassword(LoginDto loginModel)
 		{
-			////if (loginModel == null || string.IsNullOrWhiteSpace(loginModel.Email) || string.IsNullOrWhiteSpace(loginModel.Password) || !loginModel.Password.Equals(loginModel.PasswordAgain))
-			////{
-			////	throw new ArgumentException("passwords_mismatch");
-			////}
+			if (loginModel == null || string.IsNullOrWhiteSpace(loginModel.Email) || string.IsNullOrWhiteSpace(loginModel.Password) || !loginModel.Password.Equals(loginModel.PasswordAgain))
+			{
+				throw new ArgumentException("passwords_mismatch");
+			}
 
-			////var dbConnection = _repositorySettings.CreateUserConnection();
-			////await dbConnection.ExecuteAsync("update [user] set password = @newPassword where username = @email", new { newPassword = loginModel.Password, email = loginModel.Email });
+			var dbConnection = _repositorySettings.CreateUserConnection();
+			await dbConnection.ExecuteAsync("update [user] set password = @newPassword where username = @email", new { newPassword = loginModel.Password, email = loginModel.Email });
 		}
 
 		/// <summary>
@@ -265,21 +258,21 @@ namespace Marketplace
 		internal async Task<List<AccessRightEnum>> GetUserRights(string? userGuid)
 		{
 			var accessRights = new List<AccessRightEnum>();
-			//var dbConnection = _repositorySettings.CreateUserConnection();
-			//if (!string.IsNullOrWhiteSpace(userGuid))
-			//{
-			//	var accessRightIds = await dbConnection.QueryAsync<int>("select uar.AccessRightId from UserAccessRight uar inner join [user] u on uar.userId = u.Id where u.Guid = @userGuid", new { userGuid = userGuid });
-			//	if (accessRightIds != null && accessRightIds.Count() > 0)
-			//	{
-			//		foreach (var accessRightId in accessRightIds)
-			//		{
-			//			if (Enum.IsDefined(typeof(AccessRightEnum), accessRightId))
-			//			{
-			//				accessRights.Add(((AccessRightEnum)accessRightId));
-			//			}
-			//		}
-			//	}
-			//}
+			var dbConnection = _repositorySettings.CreateUserConnection();
+			if (!string.IsNullOrWhiteSpace(userGuid))
+			{
+				var accessRightIds = await dbConnection.QueryAsync<int>("select uar.AccessRightId from UserAccessRight uar inner join [user] u on uar.userId = u.Id where u.Guid = @userGuid", new { userGuid = userGuid });
+				if (accessRightIds != null && accessRightIds.Count() > 0)
+				{
+					foreach (var accessRightId in accessRightIds)
+					{
+						if (Enum.IsDefined(typeof(AccessRightEnum), accessRightId))
+						{
+							accessRights.Add(((AccessRightEnum)accessRightId));
+						}
+					}
+				}
+			}
 			return accessRights;
 		}
 
@@ -291,18 +284,18 @@ namespace Marketplace
 		/// <returns></returns>
 		internal async Task<bool> UserHasRights(string? userGuid, List<AccessRightEnum> rightsToCheck)
 		{
-			////if (!string.IsNullOrWhiteSpace(userGuid) && rightsToCheck != null && rightsToCheck.Count > 0)
-			////{
-			////	var userRights = await GetUserRights(userGuid);
-			////	foreach (var right in rightsToCheck)
-			////	{
-			////		if (!userRights.Contains(right))
-			////		{
-			////			return false;
-			////		}
-			////	}
-			////	return true;
-			////}
+			if (!string.IsNullOrWhiteSpace(userGuid) && rightsToCheck != null && rightsToCheck.Count > 0)
+			{
+				var userRights = await GetUserRights(userGuid);
+				foreach (var right in rightsToCheck)
+				{
+					if (!userRights.Contains(right))
+					{
+						return false;
+					}
+				}
+				return true;
+			}
 			return false;
 		}
 
@@ -322,16 +315,16 @@ namespace Marketplace
 		private async Task<UserDm?> GetUser(string? email = null, string? guid = null)
 		{
 			UserDm? user = null;
-			////var dbConnection = _repositorySettings.CreateUserConnection();
-			////if (!string.IsNullOrWhiteSpace(email))
-			////{
-			////	user = await dbConnection.QueryFirstOrDefaultAsync<UserDm?>("select * from [user] where username = @email and removed is null", new { email = email });
-			////}
+			var dbConnection = _repositorySettings.CreateUserConnection();
+			if (!string.IsNullOrWhiteSpace(email))
+			{
+				user = await dbConnection.QueryFirstOrDefaultAsync<UserDm?>("select * from [user] where username = @email and removed is null", new { email = email });
+			}
 
-			////if (!string.IsNullOrWhiteSpace(guid))
-			////{
-			////	user = await dbConnection.QueryFirstOrDefaultAsync<UserDm?>("select * from [user] where guid = @guid and removed is null", new { guid = guid });
-			////}
+			if (!string.IsNullOrWhiteSpace(guid))
+			{
+				user = await dbConnection.QueryFirstOrDefaultAsync<UserDm?>("select * from [user] where guid = @guid and removed is null", new { guid = guid });
+			}
 
 			return user;
 		}
@@ -344,11 +337,11 @@ namespace Marketplace
 		private async Task<UserDm?> GetUser(int id)
 		{
 			UserDm? user = null;
-			//var dbConnection = _repositorySettings.CreateUserConnection();
-			//if (id > 0)
-			//{
-			//	user = await dbConnection.QueryFirstOrDefaultAsync<UserDm?>("select * from [user] where id = @id and removed is null", new { id = id });
-			//}
+			var dbConnection = _repositorySettings.CreateUserConnection();
+			if (id > 0)
+			{
+				user = await dbConnection.QueryFirstOrDefaultAsync<UserDm?>("select * from [user] where id = @id and removed is null", new { id = id });
+			}
 			return user;
 		}
 
@@ -360,13 +353,13 @@ namespace Marketplace
 		private async Task<UserDm?> EstablishUser(string? email)
 		{
 			UserDm? user = null;
-			////var dbConnection = _repositorySettings.CreateUserConnection();
-			////if (!string.IsNullOrWhiteSpace(email))
-			////{
-			////	var newUserParams = new { guid = $"usr-{Guid.NewGuid().ToString()}", username = email, created = DateTime.UtcNow, code = Utils.GenerateRandomCode() };
-			////	var userId = await dbConnection.QueryFirstOrDefaultAsync<int>("insert into [user] (guid, username, created, code) output Inserted.ID values (@guid, @username, @created, @code)", newUserParams);
-			////	user = await GetUser(userId);
-			////}
+			var dbConnection = _repositorySettings.CreateUserConnection();
+			if (!string.IsNullOrWhiteSpace(email))
+			{
+				var newUserParams = new { guid = $"usr-{Guid.NewGuid().ToString()}", username = email, created = DateTime.UtcNow, code = Utils.GenerateRandomCode() };
+				var userId = await dbConnection.QueryFirstOrDefaultAsync<int>("insert into [user] (guid, username, created, code) output Inserted.ID values (@guid, @username, @created, @code)", newUserParams);
+				user = await GetUser(userId);
+			}
 			return user;
 		}
 
@@ -377,11 +370,11 @@ namespace Marketplace
 		/// <returns></returns>
 		private async Task RenewPasscode(long userId)
 		{
-			////var dbConnection = _repositorySettings.CreateUserConnection();
-			////if (userId > 0)
-			////{
-			////	await dbConnection.ExecuteAsync("update [user] set password = '', code = @newCode where id = @id", new { newCode = Utils.GenerateRandomCode(), id = userId });
-			////}
+			var dbConnection = _repositorySettings.CreateUserConnection();
+			if (userId > 0)
+			{
+				await dbConnection.ExecuteAsync("update [user] set password = '', code = @newCode where id = @id", new { newCode = Utils.GenerateRandomCode(), id = userId });
+			}
 		}
 
 		/// <summary>
@@ -391,11 +384,11 @@ namespace Marketplace
 		/// <returns></returns>
 		private async Task ClearUserCode(long userId)
 		{
-			//var dbConnection = _repositorySettings.CreateUserConnection();
-			//if (userId > 0)
-			//{
-			//	await dbConnection.QueryFirstOrDefaultAsync<UserDm>("update [user] set code = '' where id = @id", new { id = userId });
-			//}
+			var dbConnection = _repositorySettings.CreateUserConnection();
+			if (userId > 0)
+			{
+				await dbConnection.QueryFirstOrDefaultAsync<UserDm>("update [user] set code = '' where id = @id", new { id = userId });
+			}
 		}
 
 
