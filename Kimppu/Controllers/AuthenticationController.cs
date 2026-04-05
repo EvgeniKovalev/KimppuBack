@@ -21,7 +21,9 @@ namespace Marketplace.Controllers
 		[HttpGet("version")]
 		public async Task<IActionResult> GetVersion()
 		{
-			return Ok(new ResponseDto() { IsSuccess = true, Token = "", Message = $"", Model="77" });
+			await Task.Delay(1000);
+			var random = new Random();			
+			return Ok(new ResponseDto() { IsSuccess = true, Token = "", Message = $"", Model= random.Next().ToString() });
 		}
 
 		[HttpGet("session")]
